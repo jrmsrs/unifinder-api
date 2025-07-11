@@ -1,5 +1,6 @@
-from sqlmodel import Field, SQLModel
-from typing import Optional
+from typing import Optional, List
+from sqlmodel import Field, Relationship, SQLModel
+from enums.user import TipoUser
 
 
 class User(SQLModel, table=True):
@@ -7,3 +8,7 @@ class User(SQLModel, table=True):
     nome: str
     email: str
     senha: str
+    role: TipoUser = Field(default=TipoUser.user)
+
+    objetos: List["Objeto"] = Relationship(back_populates="user")
+
