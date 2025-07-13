@@ -1,6 +1,7 @@
 from sqlmodel import Field, Relationship, SQLModel
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
+
 from models.user import User
 from enums.objeto import TipoObjeto, StatusObjeto
 
@@ -17,3 +18,5 @@ class Objeto(SQLModel, table=True):
 
     user_id: int = Field(foreign_key="user.id")
     user: Optional[User] = Relationship(back_populates="objetos")
+
+    comentarios: List["Comentario"] = Relationship(back_populates="objeto")

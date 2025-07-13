@@ -15,6 +15,7 @@ class ObjetoUpdate(BaseModel):
     status: Optional[StatusObjeto] = None
 
 class ObjetoRead(ObjetoBase):
+    id: int
     local_armazenamento: Optional[str] = None
     data_registro: datetime
     status: StatusObjeto

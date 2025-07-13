@@ -1,10 +1,19 @@
 from fastapi import HTTPException, status
-from sqlmodel import Session
-from typing import List
+from typing import List, Optional
 from sqlmodel import Session, select
 from models.objeto import Objeto
 from models.user import User
 from schemas.objeto import ObjetoBase
+
+def fetch_objetos(session: Session, tipo: Optional[str] = None, status: Optional[str] = None) -> List[Objeto]:
+    query = select(Objeto)
+
+    if tipo:
+        query = query.where(Objeto.tipo == tipo)
+    if status:
+        query = query.where(Objeto.status == status)
+
+    return session.exec(query).all()
 
 def get_objeto(session: Session, user_id: int, objeto_id: int):
     user = session.get(User, user_id)

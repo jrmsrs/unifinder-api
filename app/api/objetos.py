@@ -1,20 +1,21 @@
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Response
-from sqlmodel import Session, select
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi_pagination import Page, paginate
+from sqlmodel import Session
+from services.comentario import fetch_comentarios_by_objeto
+from schemas.comentario import ComentarioRead
 from schemas.objeto import ObjetoUpdate
 from schemas.objeto import ObjetoBase
 from models.objeto import Objeto
 from schemas.objeto import ObjetoRead
 from infra.database import get_session
+from services.objeto import fetch_objetos
 
 router = APIRouter()
 
-@router.get("/", response_model=List[ObjetoRead])
-def get_objetos(session: Session = Depends(get_session)):
-    objetos = session.exec(select(Objeto)).all()
-    if not objetos:
-        return Response(status_code=204)
-    return objetos
+@router.get("/", response_model=Page[ObjetoRead])
+def get_objetos(tipo: Optional[str] = Query(default=None), status: Optional[str] = Query(default=None), session: Session = Depends(get_session)):
+    return paginate(fetch_objetos(session, tipo, status))
 
 @router.get("/{objeto_id}", response_model=ObjetoRead)
 def get_objeto(objeto_id: int, session: Session = Depends(get_session)):
@@ -45,3 +46,7 @@ def update_objeto(objeto_id: int, objeto_in: ObjetoUpdate, session: Session = De
     session.commit()
     session.refresh(obj)
     return obj
+
+@router.get("/{objeto_id}/comentarios", response_model=Page[ComentarioRead])
+def get_comentarios(objeto_id: int, session: Session = Depends(get_session)):
+    return paginate(fetch_comentarios_by_objeto(session, objeto_id))
