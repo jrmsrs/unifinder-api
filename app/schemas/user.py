@@ -11,7 +11,8 @@ class UserBase(BaseModel):
 
 
 class UserRead(BaseModel):
+    id: int
     nome: str
     email: str
     role: TipoUser
-    Objetos: Optional[List[Objeto]] = []
+    objetos: Optional[List[Objeto]] = []

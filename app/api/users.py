@@ -1,20 +1,23 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_pagination import Page, paginate
 from sqlmodel import Session, select
+from schemas.objeto import ObjetoRead
+from schemas.objeto import ObjetoBase
 from infra.database import get_session
 from models.user import User
 from schemas.user import UserBase, UserRead
 
-from services.objeto import get_objetos_by_user_id, get_objeto
+from services.objeto import get_objetos_by_user_id, create_objeto
 
 router = APIRouter()
 
-@router.get("/", response_model=List[UserRead])
-def get_user(session: Session = Depends(get_session)):
+@router.get("/", response_model=Page[UserRead])
+def get_users(session: Session = Depends(get_session)):
     users = session.exec(select(User)).all()
     if not users:
         raise HTTPException(status_code=404, detail="User não encontrado")
-    return users
+    return paginate(users)
 
 @router.get("/{user_id}", response_model=UserRead)
 def get_user(user_id: int, session: Session = Depends(get_session)):
@@ -35,6 +38,10 @@ def create_user(user_in: UserBase, session: Session = Depends(get_session)):
 def update_user():
     pass
 
-@router.get("/{user_id}/objetos", response_model=List[UserRead])
-def get_objetos_by_user(user_id: int, session: Session = Depends(get_session)):
-    return get_objetos_by_user_id(session, user_id)
+@router.get("/{user_id}/objetos", response_model= Page[ObjetoRead])
+def get_objetos(user_id: int, session: Session = Depends(get_session)):
+    return paginate(get_objetos_by_user_id(session, user_id))
+
+@router.post("/{user_id}/objetos", response_model=ObjetoRead)
+def post_objeto(user_id: int, objeto_data: ObjetoBase, session: Session = Depends(get_session)):
+    return create_objeto(session, user_id, objeto_data)
