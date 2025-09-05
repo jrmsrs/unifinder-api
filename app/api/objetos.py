@@ -1,4 +1,5 @@
 from typing import List, Optional
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi_pagination import Page, paginate
 from sqlmodel import Session
@@ -18,7 +19,7 @@ def get_objetos(tipo: Optional[str] = Query(default=None), status: Optional[str]
     return paginate(fetch_objetos(session, tipo, status))
 
 @router.get("/{objeto_id}", response_model=ObjetoRead)
-def get_objeto(objeto_id: int, session: Session = Depends(get_session)):
+def get_objeto(objeto_id: uuid.UUID, session: Session = Depends(get_session)):
     obj = session.get(Objeto, objeto_id)
     if not obj:
         raise HTTPException(status_code=404, detail="Objeto não encontrado")
@@ -33,7 +34,7 @@ def create_objeto(objeto_in: ObjetoBase, session: Session = Depends(get_session)
     return obj
 
 @router.put("/{objeto_id}", response_model= ObjetoRead)
-def update_objeto(objeto_id: int, objeto_in: ObjetoUpdate, session: Session = Depends(get_session)):
+def update_objeto(objeto_id: uuid.UUID, objeto_in: ObjetoUpdate, session: Session = Depends(get_session)):
     obj = session.get(Objeto, objeto_id)
     if not obj:
         raise HTTPException(status_code=404, detail="Objeto não encontrado")
@@ -48,5 +49,5 @@ def update_objeto(objeto_id: int, objeto_in: ObjetoUpdate, session: Session = De
     return obj
 
 @router.get("/{objeto_id}/comentarios", response_model=Page[ComentarioRead])
-def get_comentarios(objeto_id: int, session: Session = Depends(get_session)):
+def get_comentarios(objeto_id: uuid.UUID, session: Session = Depends(get_session)):
     return paginate(fetch_comentarios_by_objeto(session, objeto_id))

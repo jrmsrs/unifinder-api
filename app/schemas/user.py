@@ -1,5 +1,6 @@
 
 from typing import List, Optional
+import uuid
 from pydantic import BaseModel
 from models.objeto import Objeto
 from enums.user import TipoUser
@@ -11,7 +12,7 @@ class UserBase(BaseModel):
 
 
 class UserRead(BaseModel):
-    id: int
+    id: uuid.UUID
     nome: str
     email: str
     role: TipoUser

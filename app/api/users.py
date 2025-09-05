@@ -1,4 +1,5 @@
 from typing import List
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_pagination import Page, paginate
 from sqlmodel import Session, select
@@ -20,7 +21,7 @@ def get_users(session: Session = Depends(get_session)):
     return paginate(users)
 
 @router.get("/{user_id}", response_model=UserRead)
-def get_user(user_id: int, session: Session = Depends(get_session)):
+def get_user(user_id: uuid.UUID, session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User não encontrado")
@@ -39,9 +40,9 @@ def update_user():
     pass
 
 @router.get("/{user_id}/objetos", response_model= Page[ObjetoRead])
-def get_objetos(user_id: int, session: Session = Depends(get_session)):
+def get_objetos(user_id: uuid.UUID, session: Session = Depends(get_session)):
     return paginate(get_objetos_by_user_id(session, user_id))
 
 @router.post("/{user_id}/objetos", response_model=ObjetoRead)
-def post_objeto(user_id: int, objeto_data: ObjetoBase, session: Session = Depends(get_session)):
+def post_objeto(user_id: uuid.UUID, objeto_data: ObjetoBase, session: Session = Depends(get_session)):
     return create_objeto(session, user_id, objeto_data)
