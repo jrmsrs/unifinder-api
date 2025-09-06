@@ -1,3 +1,4 @@
+import uuid
 from fastapi import HTTPException, status
 from typing import List, Optional
 from sqlmodel import Session, select
@@ -15,7 +16,7 @@ def fetch_objetos(session: Session, tipo: Optional[str] = None, status: Optional
 
     return session.exec(query).all()
 
-def get_objeto(session: Session, user_id: int, objeto_id: int):
+def get_objeto(session: Session, user_id: uuid.UUID, objeto_id: uuid.UUID):
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
@@ -23,7 +24,7 @@ def get_objeto(session: Session, user_id: int, objeto_id: int):
     objeto = session.get(Objeto, objeto_id)
     return objeto
 
-def create_objeto(session: Session, user_id: int, objeto_data: ObjetoBase) -> Objeto:
+def create_objeto(session: Session, user_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
@@ -35,7 +36,7 @@ def create_objeto(session: Session, user_id: int, objeto_data: ObjetoBase) -> Ob
 
     return objeto
 
-def update_objeto(session: Session, user_id: int, objeto_id: int, objeto_data: ObjetoBase) -> Objeto:
+def update_objeto(session: Session, user_id: uuid.UUID, objeto_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
     objeto = session.get(Objeto, objeto_id)
     
     if not objeto or objeto.user_id != user_id:
@@ -50,7 +51,7 @@ def update_objeto(session: Session, user_id: int, objeto_id: int, objeto_data: O
 
     return objeto
 
-def get_objetos_by_user_id(session: Session, user_id: int) -> List[Objeto]:
+def get_objetos_by_user_id(session: Session, user_id: uuid.UUID) -> List[Objeto]:
     statement = select(Objeto).where(Objeto.user_id == user_id)
     objetos = session.exec(statement).all()
     return objetos

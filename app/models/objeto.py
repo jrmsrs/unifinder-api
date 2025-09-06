@@ -1,3 +1,4 @@
+import uuid
 from sqlmodel import Field, Relationship, SQLModel
 from typing import List, Optional
 from datetime import datetime
@@ -7,7 +8,7 @@ from enums.objeto import TipoObjeto, StatusObjeto
 
 
 class Objeto(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
     nome: str
     descricao: str
     local_ocorrencia: str
@@ -16,7 +17,7 @@ class Objeto(SQLModel, table=True):
     status: StatusObjeto = Field(default=StatusObjeto.aberto)
     data_registro: datetime = Field(default_factory=datetime.utcnow)
 
-    user_id: int = Field(foreign_key="user.id")
+    user_id: uuid.UUID = Field(foreign_key="user.id")
     user: Optional[User] = Relationship(back_populates="objetos")
 
     comentarios: List["Comentario"] = Relationship(back_populates="objeto")
