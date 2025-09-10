@@ -2,8 +2,8 @@
 from typing import List, Optional
 import uuid
 from pydantic import BaseModel
-from models.objeto import Objeto
-from enums.user import TipoUser
+from app.models.objeto import Objeto
+from app.enums.user import TipoUser
 
 class UserBase(BaseModel):
     nome: str

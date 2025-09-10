@@ -1,7 +1,7 @@
 from typing import Optional, List
 import uuid
 from sqlmodel import Field, Relationship, SQLModel
-from enums.user import TipoUser
+from app.enums.user import TipoUser
 
 
 class User(SQLModel, table=True):

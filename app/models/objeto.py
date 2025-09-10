@@ -3,8 +3,8 @@ from sqlmodel import Field, Relationship, SQLModel
 from typing import List, Optional
 from datetime import datetime
 
-from models.user import User
-from enums.objeto import TipoObjeto, StatusObjeto
+from app.models.user import User
+from app.enums.objeto import TipoObjeto, StatusObjeto
 
 
 class Objeto(SQLModel, table=True):

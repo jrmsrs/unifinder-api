@@ -3,14 +3,14 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi_pagination import Page, paginate
 from sqlmodel import Session
-from services.comentario import fetch_comentarios_by_objeto
-from schemas.comentario import ComentarioRead
-from schemas.objeto import ObjetoUpdate
-from schemas.objeto import ObjetoBase
-from models.objeto import Objeto
-from schemas.objeto import ObjetoRead
-from infra.database import get_session
-from services.objeto import fetch_objetos
+from app.services.comentario import fetch_comentarios_by_objeto
+from app.schemas.comentario import ComentarioRead
+from app.schemas.objeto import ObjetoUpdate
+from app.schemas.objeto import ObjetoBase
+from app.models.objeto import Objeto
+from app.schemas.objeto import ObjetoRead
+from app.infra.database import get_session
+from app.services.objeto import fetch_objetos
 
 router = APIRouter()
 

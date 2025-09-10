@@ -2,7 +2,7 @@ from typing import Optional
 import uuid
 from pydantic import BaseModel
 from datetime import datetime
-from enums.objeto import TipoObjeto, StatusObjeto
+from app.enums.objeto import TipoObjeto, StatusObjeto
 
 class ObjetoBase(BaseModel):
     nome: str

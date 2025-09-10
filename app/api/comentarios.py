@@ -1,9 +1,9 @@
 import uuid
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
-from schemas.comentario import ComentarioBase, ComentarioUpdate, ComentarioRead
-from services.comentario import create_comentario, update_comentario, remove_comentario
-from infra.database import get_session
+from app.schemas.comentario import ComentarioBase, ComentarioUpdate, ComentarioRead
+from app.services.comentario import create_comentario, update_comentario, remove_comentario
+from app.infra.database import get_session
 
 
 router = APIRouter()

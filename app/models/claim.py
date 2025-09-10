@@ -2,7 +2,7 @@ import uuid
 from sqlmodel import Field, SQLModel
 from typing import Optional
 from datetime import datetime
-from enums.claim import StatusClaim
+from app.enums.claim import StatusClaim
 
 class Claim(SQLModel, table=True):
     id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)

@@ -2,9 +2,9 @@ import uuid
 from fastapi import HTTPException, status
 from typing import List, Optional
 from sqlmodel import Session, select
-from models.objeto import Objeto
-from models.user import User
-from schemas.objeto import ObjetoBase
+from app.models.objeto import Objeto
+from app.models.user import User
+from app.schemas.objeto import ObjetoBase
 
 def fetch_objetos(session: Session, tipo: Optional[str] = None, status: Optional[str] = None) -> List[Objeto]:
     query = select(Objeto)

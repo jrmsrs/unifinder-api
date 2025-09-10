@@ -3,8 +3,8 @@ from typing import List
 import uuid
 from fastapi import HTTPException
 from sqlmodel import Session, select
-from models.comentario import Comentario
-from schemas.comentario import ComentarioBase, ComentarioRead, ComentarioUpdate
+from app.models.comentario import Comentario
+from app.schemas.comentario import ComentarioBase, ComentarioRead, ComentarioUpdate
 
 
 def fetch_comentarios_by_objeto(session: Session, objeto_id: uuid.UUID) -> List[ComentarioRead]:

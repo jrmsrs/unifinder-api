@@ -1,11 +1,11 @@
-import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlmodel import Session
+from app.infra.config import Settings
 
 load_dotenv()
 # DATABASE_URL = "sqlite:///./database.db"
-DATABASE_URL = os.getenv("DATABASE_URL") or "sqlite:///./database.db"
+DATABASE_URL = Settings.database_url
 
 # engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 # SessionLocal = sessionmaker(bind=engine, autoflush=False)

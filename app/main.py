@@ -2,12 +2,12 @@
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 from sqlmodel import SQLModel
-from api import objetos, users, comentarios
-from infra.database import engine
+from app.api import objetos, users, comentarios
+from app.infra.database import engine
 
 app = FastAPI()
 
-SQLModel.metadata.create_all(engine)
+# SQLModel.metadata.create_all(engine)
 
 app.include_router(objetos.router, prefix='/objetos', tags=["Objetos"])
 app.include_router(users.router, prefix='/users', tags=["Users"])

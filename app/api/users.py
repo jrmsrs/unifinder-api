@@ -3,18 +3,27 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_pagination import Page, paginate
 from sqlmodel import Session, select
-from schemas.objeto import ObjetoRead
-from schemas.objeto import ObjetoBase
-from infra.database import get_session
-from models.user import User
-from schemas.user import UserBase, UserRead
+from app.auth.auth import get_user_session, require_role
+from app.schemas.objeto import ObjetoRead
+from app.schemas.objeto import ObjetoBase
+from app.infra.database import get_session
+from app.models.user import User
+from app.schemas.user import UserBase, UserRead
 
-from services.objeto import get_objetos_by_user_id, create_objeto
+from app.services.objeto import get_objetos_by_user_id, create_objeto
 
 router = APIRouter()
 
-@router.get("/", response_model=Page[UserRead])
-def get_users(session: Session = Depends(get_session)):
+@router.get("/me")
+def me(current_user: dict = Depends(get_user_session)):
+    return {
+        "id": current_user["user_id"],
+        "email": current_user["email"],
+        "role": current_user["role"]
+    }
+
+@router.get("/", response_model=Page[UserRead] )
+def get_users(session: Session = Depends(get_session), current_user: dict = Depends(require_role("admin"))):
     users = session.exec(select(User)).all()
     if not users:
         raise HTTPException(status_code=404, detail="User não encontrado")
