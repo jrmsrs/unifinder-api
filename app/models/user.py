@@ -8,7 +8,7 @@ class User(SQLModel, table=True):
     id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
     nome: str
     email: str
-    username: str
+    username: str = Field(unique=True)
     role: TipoUser = Field(default=TipoUser.user)
 
     objetos: List["Objeto"] = Relationship(back_populates="user")

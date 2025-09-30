@@ -16,3 +16,4 @@ class ComentarioRead(ComentarioBase):
     publicado_em: datetime
     objeto_id: uuid.UUID
     user_id: uuid.UUID
+    username: str

@@ -8,6 +8,7 @@ class ObjetoBase(BaseModel):
     nome: str
     descricao: str
     local_ocorrencia: str
+    url_imagem: str
     tipo: TipoObjeto
 
 class ObjetoUpdate(BaseModel):
@@ -16,6 +17,7 @@ class ObjetoUpdate(BaseModel):
 
 class ObjetoRead(ObjetoBase):
     id: uuid.UUID
+    user_id: uuid.UUID
     local_armazenamento: Optional[str] = None
     data_registro: datetime
     status: StatusObjeto

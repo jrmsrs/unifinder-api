@@ -16,6 +16,7 @@ class Objeto(SQLModel, table=True):
     tipo: TipoObjeto
     status: StatusObjeto = Field(default=StatusObjeto.aberto)
     data_registro: datetime = Field(default_factory=datetime.utcnow)
+    url_imagem: str = Field(default=None, nullable=True)
 
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: Optional[User] = Relationship(back_populates="objetos")
