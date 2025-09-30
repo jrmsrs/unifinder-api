@@ -7,6 +7,7 @@ class ComentarioBase(BaseModel):
     conteudo: str = Field(..., min_length=1)
     objeto_id: uuid.UUID
     user_id: uuid.UUID
+    username: str
 
 class ComentarioUpdate(BaseModel):
     conteudo: str = Field(..., min_length=1)
@@ -16,4 +17,3 @@ class ComentarioRead(ComentarioBase):
     publicado_em: datetime
     objeto_id: uuid.UUID
     user_id: uuid.UUID
-    username: str

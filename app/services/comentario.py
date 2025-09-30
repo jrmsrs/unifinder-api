@@ -13,10 +13,12 @@ def fetch_comentarios_by_objeto(session: Session, objeto_id: uuid.UUID) -> List[
     return resultados
     
 def create_comentario( session: Session, comentario_data: ComentarioBase) -> ComentarioRead:
+
     comentario = Comentario(
         conteudo=comentario_data.conteudo,
         objeto_id=comentario_data.objeto_id,
-        user_id=comentario_data.user_id
+        user_id=comentario_data.user_id,
+        username=comentario_data.username
     )
     session.add(comentario)
     session.commit()

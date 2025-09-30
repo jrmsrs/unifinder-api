@@ -8,8 +8,8 @@ class ObjetoBase(BaseModel):
     nome: str
     descricao: str
     local_ocorrencia: str
-    url_imagem: str
     tipo: TipoObjeto
+    url_imagem: Optional[str] = None
 
 class ObjetoUpdate(BaseModel):
     local_armazenamento: Optional[str] = None
