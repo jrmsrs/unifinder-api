@@ -19,6 +19,6 @@ class Objeto(SQLModel, table=True):
     url_imagem: str = Field(default=None, nullable=True)
 
     user_id: uuid.UUID = Field(foreign_key="user.id")
-    user: Optional[User] = Relationship(back_populates="objetos")
+    user: User = Relationship(back_populates="objetos")
 
     comentarios: List["Comentario"] = Relationship(back_populates="objeto")

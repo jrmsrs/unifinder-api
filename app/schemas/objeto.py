@@ -3,6 +3,7 @@ import uuid
 from pydantic import BaseModel
 from datetime import datetime
 from app.enums.objeto import TipoObjeto, StatusObjeto
+from app.models.user import User
 
 class ObjetoBase(BaseModel):
     nome: str
@@ -21,3 +22,4 @@ class ObjetoRead(ObjetoBase):
     local_armazenamento: Optional[str] = None
     data_registro: datetime
     status: StatusObjeto
+    user: User
