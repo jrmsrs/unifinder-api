@@ -1,8 +1,10 @@
 from typing import List, Optional
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_pagination import Page, paginate
 from sqlmodel import Session
+from app.schemas.claim import ClaimRead
+from app.services.claim import fetch_claims_by_objeto
 from app.services.comentario import fetch_comentarios_by_objeto
 from app.schemas.comentario import ComentarioRead
 from app.schemas.objeto import ObjetoUpdate
@@ -25,16 +27,8 @@ def get_objeto(objeto_id: uuid.UUID, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Objeto não encontrado")
     return obj
 
-@router.post("/", response_model=ObjetoRead)
-def create_objeto(objeto_in: ObjetoBase, session: Session = Depends(get_session)):
-    obj = Objeto.model_validate(objeto_in)
-    session.add(obj)
-    session.commit()
-    session.refresh(obj)
-    return obj
-
 @router.put("/{objeto_id}", response_model= ObjetoRead)
-def update_objeto(objeto_id: uuid.UUID, objeto_in: ObjetoUpdate, session: Session = Depends(get_session)):
+def put_objeto(objeto_id: uuid.UUID, objeto_in: ObjetoUpdate, session: Session = Depends(get_session)):
     obj = session.get(Objeto, objeto_id)
     if not obj:
         raise HTTPException(status_code=404, detail="Objeto não encontrado")
@@ -51,3 +45,9 @@ def update_objeto(objeto_id: uuid.UUID, objeto_in: ObjetoUpdate, session: Sessio
 @router.get("/{objeto_id}/comentarios", response_model=Page[ComentarioRead])
 def get_comentarios(objeto_id: uuid.UUID, session: Session = Depends(get_session)):
     return paginate(fetch_comentarios_by_objeto(session, objeto_id))
+
+
+@router.get("/{objeto_id}/claims", response_model=Page[ClaimRead])
+def get_claims(objeto_id: uuid.UUID, session: Session = Depends(get_session)):
+    return paginate( fetch_claims_by_objeto(session, objeto_id))
+

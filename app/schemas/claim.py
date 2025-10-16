@@ -9,11 +9,8 @@ class ClaimBase(BaseModel):
     local_ocorrencia: Optional[str] = None
     data_ocorrencia: Optional[str] = None
     evidencias: Optional[List[str]] = Field(default_factory=list)
-    user_id: uuid.UUID
+    tutor_id: uuid.UUID
     objeto_id: uuid.UUID
-
-class ComentarioUpdate(BaseModel):
-    status: StatusClaim
 
 class ClaimRead(ClaimBase):
     id: uuid.UUID
