@@ -6,52 +6,57 @@ from app.models.objeto import Objeto
 from app.models.user import User
 from app.schemas.objeto import ObjetoBase
 
-def fetch_objetos(session: Session, tipo: Optional[str] = None, status: Optional[str] = None) -> List[Objeto]:
-    query = select(Objeto)
 
-    if tipo:
-        query = query.where(Objeto.tipo == tipo)
-    if status:
-        query = query.where(Objeto.status == status)
+class ObjetoService:
+    def __init__(self, session: Session):
+        self.session = session
 
-    return session.exec(query).all()
+    def fetch_objetos(self, tipo: Optional[str] = None, status: Optional[str] = None) -> List[Objeto]:
+        query = select(Objeto)
 
-def get_objeto(session: Session, user_id: uuid.UUID, objeto_id: uuid.UUID):
-    user = session.get(User, user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
+        if tipo:
+            query = query.where(Objeto.tipo == tipo)
+        if status:
+            query = query.where(Objeto.status == status)
 
-    objeto = session.get(Objeto, objeto_id)
-    return objeto
+        return self.session.exec(query).all()
 
-def create_objeto(session: Session, user_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
-    user = session.get(User, user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
+    def get_objeto(self, user_id: uuid.UUID, objeto_id: uuid.UUID):
+        user = self.session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
 
-    objeto = Objeto(**objeto_data.model_dump(), user_id=user_id)
-    session.add(objeto)
-    session.commit()
-    session.refresh(objeto)
+        objeto = self.session.get(Objeto, objeto_id)
+        return objeto
 
-    return objeto
+    def create_objeto(self, user_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
+        user = self.session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
 
-def update_objeto(session: Session, user_id: uuid.UUID, objeto_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
-    objeto = session.get(Objeto, objeto_id)
-    
-    if not objeto or objeto.user_id != user_id:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objeto não pertence ao usuário")
+        objeto = Objeto(**objeto_data.model_dump(), user_id=user_id)
+        self.session.add(objeto)
+        self.session.commit()
+        self.session.refresh(objeto)
 
-    objeto.local_armazenamento = objeto_data.local_armazenamento
-    objeto.status = objeto_data.status
+        return objeto
 
-    session.add(objeto)
-    session.commit()
-    session.refresh(objeto)
+    def update_objeto(self, user_id: uuid.UUID, objeto_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
+        objeto = self.session.get(Objeto, objeto_id)
+        
+        if not objeto or objeto.user_id != user_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objeto não pertence ao usuário")
 
-    return objeto
+        objeto.local_armazenamento = objeto_data.local_armazenamento
+        objeto.status = objeto_data.status
 
-def get_objetos_by_user_id(session: Session, user_id: uuid.UUID) -> List[Objeto]:
-    statement = select(Objeto).where(Objeto.user_id == user_id)
-    objetos = session.exec(statement).all()
-    return objetos
+        self.session.add(objeto)
+        self.session.commit()
+        self.session.refresh(objeto)
+
+        return objeto
+
+    def get_objetos_by_user_id(self, user_id: uuid.UUID) -> List[Objeto]:
+        statement = select(Objeto).where(Objeto.user_id == user_id)
+        objetos = self.session.exec(statement).all()
+        return objetos

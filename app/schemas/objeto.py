@@ -11,6 +11,7 @@ class ObjetoBase(BaseModel):
     local_ocorrencia: str
     tipo: TipoObjeto
     url_imagem: Optional[str] = None
+    categoria: str
 
 class ObjetoUpdate(BaseModel):
     local_armazenamento: Optional[str] = None

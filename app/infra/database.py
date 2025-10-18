@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlmodel import Session
 from app.infra.config import Settings
 
-load_dotenv()
+# load_dotenv()
 # DATABASE_URL = "sqlite:///./database.db"
 DATABASE_URL = Settings.database_url
 

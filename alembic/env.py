@@ -26,6 +26,7 @@ if config.config_file_name is not None:
 target_metadata = SQLModel.metadata
 from app.models.claim import Claim
 from app.models.comentario import Comentario
+from app.models.notify import Notification
 from app.models.objeto import Objeto
 from app.models.user import User
 
