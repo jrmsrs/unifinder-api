@@ -9,8 +9,8 @@ from app.schemas.objeto import ObjetoBase
 from app.infra.database import get_session
 from app.models.user import User
 from app.schemas.user import UserBase, UserRead
-
-from app.services.objeto import get_objetos_by_user_id, create_objeto
+from app.services.objeto import ObjetoService
+from app.services.factories import get_objeto_service
 
 router = APIRouter()
 
@@ -23,10 +23,8 @@ def me(current_user: dict = Depends(get_user_session)):
     }
 
 @router.get("/", response_model=Page[UserRead] )
-def get_users(session: Session = Depends(get_session), current_user: dict = Depends(require_role("admin"))):
+def get_users(session: Session = Depends(get_session)):
     users = session.exec(select(User)).all()
-    if not users:
-        raise HTTPException(status_code=404, detail="User não encontrado")
     return paginate(users)
 
 @router.get("/{user_id}", response_model=UserRead)
@@ -49,9 +47,16 @@ def update_user():
     pass
 
 @router.get("/{user_id}/objetos", response_model= Page[ObjetoRead])
-def get_objetos(user_id: uuid.UUID, session: Session = Depends(get_session)):
-    return paginate(get_objetos_by_user_id(session, user_id))
+def get_objetos(
+    user_id: uuid.UUID, 
+    objeto_service: ObjetoService = Depends(get_objeto_service)
+):
+    return paginate(objeto_service.get_objetos_by_user_id(user_id))
 
 @router.post("/{user_id}/objetos", response_model=ObjetoRead)
-def post_objeto(user_id: uuid.UUID, objeto_data: ObjetoBase, session: Session = Depends(get_session)):
-    return create_objeto(session, user_id, objeto_data)
+def post_objeto(
+    user_id: uuid.UUID, 
+    objeto_data: ObjetoBase, 
+    objeto_service: ObjetoService = Depends(get_objeto_service)
+):
+    return objeto_service.create_objeto(user_id, objeto_data)

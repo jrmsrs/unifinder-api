@@ -1,28 +1,16 @@
-import asyncio
-from fastapi import APIRouter, Request
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Depends, Request
+from app.integrations.sse_manager import SSEManager, get_sse_manager
+from app.services.notify import NotificationService
+from app.services.factories import get_notification_service
+from pydantic import BaseModel
 
 router = APIRouter()
-connections = {}
+
 
 @router.get("/sse/{user_id}")
-async def sse(user_id: str, request: Request):
-    queue = asyncio.Queue()
-    
-    connections[user_id] = queue
-
-    async def event_generator():
-        while True:
-            if await request.is_disconnected():
-                break
-            message = await queue.get()
-            yield f"data: {message}\n\n"
-
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
-
-@router.post("/{user_id}")
-async def notify(user_id: str, message: str):
-    if user_id in connections:
-        await connections[user_id].put(message)
-        return {"status": "notificado"}
-    return {"error": "usuário não conectado"}
+async def sse_endpoint(
+    user_id: str,
+    request: Request,
+    sse_manager: SSEManager = Depends(get_sse_manager)
+):
+    return await sse_manager.connect(user_id, request)

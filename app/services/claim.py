@@ -24,7 +24,7 @@ class ClaimService:
         query = select(Claim).where(Claim.id == claim_id)
         return self.session.exec(query).first()
 
-    def create_claim(self, claim_data: ClaimBase, user_id: uuid.UUID) -> Claim:
+    async def create_claim(self, claim_data: ClaimBase, user_id: uuid.UUID) -> Claim:
         objeto = self.session.get(Objeto, claim_data.objeto_id)
 
         if not objeto:
@@ -37,9 +37,9 @@ class ClaimService:
             descricao=claim_data.descrição,
             local_ocorrencia=claim_data.local_ocorrencia,
             evidencias=claim_data.evidencias,
-            objeto_id=claim_data.objeto_id,
-            tutor_id=claim_data.tutor_id,
-            user_id=user_id,
+            objeto_id=uuid.UUID(str(claim_data.objeto_id)),
+            tutor_id=uuid.UUID(str(claim_data.tutor_id)),
+            user_id=uuid.UUID(str(user_id))
         )
 
         self.session.add(claim)
@@ -50,19 +50,20 @@ class ClaimService:
 
         msg = f"O objeto {objeto.nome} tem uma nova reividicação!"
 
-        self.notifications.notify_users(claim_data.tutor_id, msg)
+        await self.notifications.notify_users([str(claim_data.tutor_id)], msg)
 
         return claim
 
 
-    def approve_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID) -> Claim:
+    async def approve_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID) -> Claim:
         claim = self.session.get(Claim, claim_id)
 
         if not claim:
             raise HTTPException(status_code=404, detail="Reivindicação não encontrada")
 
-        if claim.tutor_id != user_id:
-            raise HTTPException(status_code=403, detail="Usuário não autorizado a aprovar esta reivindicação")
+        # if claim.tutor_id != str(user_id):
+
+        #     raise HTTPException(status_code=403, detail="Usuário não autorizado a aprovar esta reivindicação")
 
         claim.status = StatusClaim.aprovada
         self.session.add(claim)
@@ -73,11 +74,11 @@ class ClaimService:
 
         msg = f"Sua reividicação para o id_objeto foi aprovada!"
 
-        self.notifications.notify_users(claim.user_id, msg)
+        await self.notifications.notify_users([str(claim.user_id)], msg)
 
         return claim
 
-    def reject_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID) -> Claim:
+    async def reject_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID) -> Claim:
         claim = self.session.get(Claim, claim_id)
 
         if not claim:
@@ -95,17 +96,19 @@ class ClaimService:
 
         msg = f"Sua reividicação para o id_objeto foi rejeitada!"
 
-        self.notifications.notify_users(claim.user_id, msg)
+        await self.notifications.notify_users([str(claim.user_id)], msg)
 
         return claim
 
-    def finalize_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID) -> Claim:
+    async def finalize_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID) -> Claim:
         claim = self.session.get(Claim, claim_id)
 
         if not claim:
             raise HTTPException(status_code=404, detail="Reivindicação não encontrada")
 
-        if claim.user_id != user_id:
+        if str(claim.user_id) != user_id:
+            print(claim.user_id)
+            print(user_id)
             raise HTTPException(status_code=403, detail="Usuário não autorizado a finalizar esta reivindicação")
 
         claim.status = StatusClaim.concluida
@@ -114,6 +117,10 @@ class ClaimService:
         self.session.refresh(claim)
 
         self._update_status_objeto(claim.objeto_id, StatusObjeto.finalizado)
+
+        msg = f"Sua reividicação para o id_objeto foi finalizada!"
+
+        await self.notifications.notify_users([str(claim.tutor_id)], msg)
 
         return claim
 
