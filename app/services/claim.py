@@ -46,7 +46,7 @@ class ClaimService:
         self.session.commit()
         self.session.refresh(claim)
 
-        self._update_status_objeto(claim_data.objeto_id, StatusObjeto.em_reinvidicação)
+        self._update_status_objeto(claim_data.objeto_id, StatusObjeto.em_reivindicacao)
 
         msg = f"O objeto {objeto.nome} tem uma nova reividicação!"
 
@@ -61,9 +61,9 @@ class ClaimService:
         if not claim:
             raise HTTPException(status_code=404, detail="Reivindicação não encontrada")
 
-        # if claim.tutor_id != str(user_id):
+        if claim.tutor_id != user_id:
 
-        #     raise HTTPException(status_code=403, detail="Usuário não autorizado a aprovar esta reivindicação")
+            raise HTTPException(status_code=403, detail="Usuário não autorizado a aprovar esta reivindicação")
 
         claim.status = StatusClaim.aprovada
         self.session.add(claim)
@@ -72,7 +72,9 @@ class ClaimService:
 
         self._update_status_objeto(claim.objeto_id, StatusObjeto.aguardando_retirada)
 
-        msg = f"Sua reividicação para o id_objeto foi aprovada!"
+        objeto = self.session.get(Objeto, claim.objeto_id)
+
+        msg = f"Sua reividicação para o '{objeto.nome}' foi aprovada!"
 
         await self.notifications.notify_users([str(claim.user_id)], msg)
 
