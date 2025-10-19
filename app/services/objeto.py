@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlmodel import Session, select
 from app.models.objeto import Objeto
 from app.models.user import User
-from app.schemas.objeto import ObjetoBase
+from app.schemas.objeto import ObjetoBase, ObjetoUpdate
 
 
 class ObjetoService:
@@ -21,12 +21,10 @@ class ObjetoService:
 
         return self.session.exec(query).all()
 
-    def get_objeto(self, user_id: uuid.UUID, objeto_id: uuid.UUID):
-        user = self.session.get(User, user_id)
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
-
+    def get_objeto(self, objeto_id: uuid.UUID):
         objeto = self.session.get(Objeto, objeto_id)
+        if not objeto:
+            raise HTTPException(status_code=404, detail="Objeto não encontrado")
         return objeto
 
     def create_objeto(self, user_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
@@ -41,7 +39,7 @@ class ObjetoService:
 
         return objeto
 
-    def update_objeto(self, user_id: uuid.UUID, objeto_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
+    def update_objeto(self, user_id: uuid.UUID, objeto_id: uuid.UUID, objeto_data: ObjetoUpdate) -> Objeto:
         objeto = self.session.get(Objeto, objeto_id)
         
         if not objeto or objeto.user_id != user_id:
