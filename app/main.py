@@ -5,9 +5,9 @@ from sqlmodel import SQLModel
 from app.api import objetos, users, comentarios, claims, notifys
 from app.infra.database import engine
 
-app = FastAPI()
+app = FastAPI(title="UnifinderAPI")
 
-# SQLModel.metadata.create_all(engine)
+SQLModel.metadata.create_all(engine)
 
 app.include_router(objetos.router, prefix='/objetos', tags=["Objetos"])
 app.include_router(users.router, prefix='/users', tags=["Users"])
