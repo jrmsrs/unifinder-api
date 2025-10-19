@@ -9,7 +9,6 @@ class ClaimBase(BaseModel):
     local_ocorrencia: Optional[str] = None
     data_ocorrencia: Optional[str] = None
     evidencias: Optional[List[str]] = Field(default_factory=list)
-    tutor_id: uuid.UUID
     objeto_id: uuid.UUID
 
 class ClaimRead(ClaimBase):

@@ -38,7 +38,7 @@ class ClaimService:
             local_ocorrencia=claim_data.local_ocorrencia,
             evidencias=claim_data.evidencias,
             objeto_id=uuid.UUID(str(claim_data.objeto_id)),
-            tutor_id=uuid.UUID(str(claim_data.tutor_id)),
+            tutor_id=uuid.UUID(str(objeto.user_id)),
             user_id=uuid.UUID(str(user_id))
         )
 
