@@ -7,10 +7,9 @@ from app.enums.claim import StatusClaim
 class Claim(SQLModel, table=True):
 
     id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
-    
     descricao: Optional[str] = None
     local_ocorrencia: Optional[str] = None
-    data_acorrencia: Optional[str] = None
+    data_ocorrencia: Optional[str] = None
     evidencias: Optional[List[str]] = Field(sa_column=Column(JSON))
 
     status: StatusClaim = Field(default=StatusClaim.pendente)

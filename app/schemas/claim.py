@@ -5,7 +5,7 @@ from typing import Optional, List
 from app.enums.claim import StatusClaim
 
 class ClaimBase(BaseModel):
-    descrição: Optional[str] = None
+    descricao: Optional[str] = None
     local_ocorrencia: Optional[str] = None
     data_ocorrencia: Optional[str] = None
     evidencias: Optional[List[str]] = Field(default_factory=list)
