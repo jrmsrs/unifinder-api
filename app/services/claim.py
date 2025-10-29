@@ -50,7 +50,7 @@ class ClaimService:
 
         msg = f"O objeto {objeto.nome} tem uma nova reividicação!"
 
-        await self.notifications.notify_users([str(claim_data.tutor_id)], msg)
+        await self.notifications.notify_users([str(claim.tutor_id)], msg)
 
         return claim
 
