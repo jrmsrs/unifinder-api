@@ -34,7 +34,7 @@ class ClaimService:
             raise HTTPException(status_code=400, detail="Objeto não disponível para reivindicação")
 
         claim = Claim(
-            descricao=claim_data.descrição,
+            descricao=claim_data.descricao,
             local_ocorrencia=claim_data.local_ocorrencia,
             evidencias=claim_data.evidencias,
             objeto_id=uuid.UUID(str(claim_data.objeto_id)),
