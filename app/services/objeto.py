@@ -1,7 +1,7 @@
 import uuid
 from fastapi import HTTPException, status
 from typing import List, Optional
-from sqlmodel import Session, select
+from sqlmodel import Session, select, desc
 from app.models.objeto import Objeto
 from app.models.user import User
 from app.schemas.objeto import ObjetoBase, ObjetoUpdate
@@ -12,12 +12,15 @@ class ObjetoService:
         self.session = session
 
     def fetch_objetos(self, tipo: Optional[str] = None, status: Optional[str] = None) -> List[Objeto]:
-        query = select(Objeto)
+        query = select(Objeto).order_by(desc(Objeto.data_registro))
 
         if tipo:
             query = query.where(Objeto.tipo == tipo)
         if status:
-            query = query.where(Objeto.status == status)
+            if status == "aberto":
+                query = query.where((Objeto.status == "aberto") | (Objeto.status == "em_reivindicacao"))
+            else:
+                query = query.where(Objeto.status == status)
 
         return self.session.exec(query).all()
 
