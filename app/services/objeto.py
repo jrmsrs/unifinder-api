@@ -11,7 +11,7 @@ class ObjetoService:
     def __init__(self, session: Session):
         self.session = session
 
-    def fetch_objetos(self, tipo: Optional[str] = None, status: Optional[str] = None) -> List[Objeto]:
+    def fetch_objetos(self, tipo: Optional[str] = None, status: Optional[str] = None, categoria: Optional[str] = None, local_ocorrencia: Optional[str] = None, search: Optional[str] = None) -> List[Objeto]:
         query = select(Objeto).order_by(desc(Objeto.data_registro))
 
         if tipo:
@@ -21,6 +21,17 @@ class ObjetoService:
                 query = query.where((Objeto.status == "aberto") | (Objeto.status == "em_reivindicacao"))
             else:
                 query = query.where(Objeto.status == status)
+        if categoria:
+            query = query.where(Objeto.categoria == categoria)
+        if local_ocorrencia:
+            query = query.where(Objeto.local_ocorrencia == local_ocorrencia)
+        if search:
+            search_term = f"%{search.lower()}%"
+            query = query.where(
+                (Objeto.nome.ilike(search_term)) |
+                (Objeto.descricao.ilike(search_term)) |
+                (Objeto.local_armazenamento.ilike(search_term))
+            )
 
         return self.session.exec(query).all()
 

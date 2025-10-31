@@ -19,9 +19,12 @@ router = APIRouter()
 def get_objetos(
     tipo: Optional[str] = Query(default=None),
     status: Optional[str] = Query(default=None),
+    categoria: Optional[str] = Query(default=None),
+    local_ocorrencia: Optional[str] = Query(default=None),
+    search: Optional[str] = Query(default=None),
     objeto_service: ObjetoService = Depends(get_objeto_service)
 ):
-    return paginate(objeto_service.fetch_objetos(tipo, status))
+    return paginate(objeto_service.fetch_objetos(tipo, status, categoria, local_ocorrencia, search))
 
 @router.get("/{objeto_id}", response_model=ObjetoRead)
 def get_objeto(objeto_id: uuid.UUID, objeto_service: ObjetoService = Depends(get_objeto_service)):
