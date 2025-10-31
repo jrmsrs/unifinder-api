@@ -9,7 +9,7 @@ from app.schemas.objeto import ObjetoUpdate
 from app.schemas.objeto import ObjetoRead
 from app.services.claim import ClaimService
 from app.services.comentario import ComentarioService
-from app.services.factories import get_claim_service, get_objeto_service
+from app.services.factories import get_claim_service, get_objeto_service, get_comentario_service
 from app.services.objeto import ObjetoService
 
 
@@ -41,7 +41,7 @@ def put_objeto(
 @router.get("/{objeto_id}/comentarios", response_model=Page[ComentarioRead])
 def get_comentarios(
     objeto_id: uuid.UUID,
-    comentario_service: ComentarioService = Depends(get_objeto_service),
+    comentario_service: ComentarioService = Depends(get_comentario_service),
 ):
     return paginate(comentario_service.fetch_comentarios_by_objeto(objeto_id))
 
