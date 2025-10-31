@@ -4,8 +4,17 @@ from fastapi_pagination import add_pagination
 from sqlmodel import SQLModel
 from app.api import objetos, users, comentarios, claims, notifys
 from app.infra.database import engine
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="UnifinderAPI")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 SQLModel.metadata.create_all(engine)
 
