@@ -24,6 +24,19 @@ class ClaimService:
         query = select(Claim).where(Claim.id == claim_id)
         return self.session.exec(query).first()
 
+    def fetch_claims_by_user(self, user_id: uuid.UUID) -> List[ClaimRead]:
+        """Busca todas as claims feitas pelo usuário"""
+        query = select(Claim).where(Claim.user_id == user_id)
+        return self.session.exec(query).all()
+
+    def fetch_pending_claims_by_tutor(self, tutor_id: uuid.UUID) -> List[ClaimRead]:
+        """Busca claims atribuídas ao tutor que estão pendentes de aprovação"""
+        query = select(Claim).where(
+            Claim.tutor_id == tutor_id,
+            Claim.status == StatusClaim.pendente
+        )
+        return self.session.exec(query).all()
+
     async def create_claim(self, claim_data: ClaimBase, user_id: uuid.UUID) -> Claim:
         objeto = self.session.get(Objeto, claim_data.objeto_id)
 

@@ -1,8 +1,5 @@
 from fastapi import APIRouter, Depends, Request
 from app.integrations.sse_manager import SSEManager, get_sse_manager
-from app.services.notify import NotificationService
-from app.services.factories import get_notification_service
-from pydantic import BaseModel
 
 router = APIRouter()
 

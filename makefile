@@ -1,5 +1,4 @@
-# Variável de ambiente com a URL do banco
-# Exemplo: export DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/dbname
+
 DB_URL ?= $(DATABASE_URL)
 
 # Gera uma nova migration automaticamente (passar mensagem: make migration m="create users table")
@@ -32,3 +31,30 @@ history:
 # Verifica o estado atual do banco
 current:
 	@DATABASE_URL=$(DB_URL) python3 -m alembic current
+
+# ===========================================
+# COMANDOS PARA DADOS DE TESTE E SERVIDOR
+# ===========================================
+
+# Insere dados de teste no banco
+seed-test:
+	@echo "🌱 Inserindo dados de teste..."
+	@./venv/bin/python manage_test_data.py seed
+
+# Remove dados de teste do banco
+clear-test:
+	@echo "🧹 Removendo dados de teste..."
+	@./venv/bin/python manage_test_data.py clear
+
+# Reset completo dos dados de teste (limpar + inserir)
+reset-test:
+	@echo "🔄 Resetando dados de teste..."
+	@./venv/bin/python manage_test_data.py reset
+
+# Inicia o servidor de desenvolvimento
+dev:
+	@echo "🚀 Iniciando servidor de desenvolvimento..."
+	@./venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Comando principal: reseta dados de teste e inicia o servidor
+start: reset-test dev

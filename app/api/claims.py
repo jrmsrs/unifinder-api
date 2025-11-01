@@ -1,5 +1,6 @@
 import uuid
 from fastapi import APIRouter, Depends
+from fastapi_pagination import Page, paginate
 
 from app.auth.auth import get_user_session
 from app.services.claim import ClaimService
@@ -9,9 +10,28 @@ from app.schemas.claim import ClaimBase, ClaimRead
 router = APIRouter()
 
 
+@router.get("/me", response_model=Page[ClaimRead])
+def get_my_claims(
+    current_user: dict = Depends(get_user_session),
+    claim_service: ClaimService = Depends(get_claim_service)
+):
+    """Busca todas as claims feitas pelo usuário autenticado"""
+    user_id = current_user.get("user_id")
+    return paginate(claim_service.fetch_claims_by_user(user_id))
+
+
+@router.get("/pending", response_model=Page[ClaimRead])
+def get_pending_claims(
+    current_user: dict = Depends(get_user_session),
+    claim_service: ClaimService = Depends(get_claim_service)
+):
+    """Busca claims atribuídas ao usuário autenticado que estão pendentes de aprovação"""
+    user_id = current_user.get("user_id")
+    return paginate(claim_service.fetch_pending_claims_by_tutor(user_id))
+
 
 @router.get("/{claim_id}", response_model=ClaimRead)
-def get_claim( claim_id: uuid.UUID, claim_service: ClaimService = Depends(get_claim_service)):
+def get_claim(claim_id: uuid.UUID, claim_service: ClaimService = Depends(get_claim_service)):
     return claim_service.fetch_claim(claim_id)
 
 
