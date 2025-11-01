@@ -74,7 +74,7 @@ class ClaimService:
         if not claim:
             raise HTTPException(status_code=404, detail="Reivindicação não encontrada")
 
-        if claim.tutor_id != user_id:
+        if str(claim.tutor_id) != user_id:
 
             raise HTTPException(status_code=403, detail="Usuário não autorizado a aprovar esta reivindicação")
 
@@ -99,7 +99,7 @@ class ClaimService:
         if not claim:
             raise HTTPException(status_code=404, detail="Reivindicação não encontrada")
 
-        if claim.tutor_id != user_id:
+        if str(claim.tutor_id) != user_id:
             raise HTTPException(status_code=403, detail="Usuário não autorizado a rejeitar esta reivindicação")
 
         claim.status = StatusClaim.rejeitada
