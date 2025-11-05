@@ -70,6 +70,9 @@ class ObjetoService:
         return objeto
 
     def finalizar_objeto(self, user_id: uuid.UUID, objeto_id: uuid.UUID, finalizacao_data: ObjetoFinalizacao) -> Objeto:
+        if isinstance(user_id, str):
+            user_id = uuid.UUID(user_id)
+        
         objeto = self.session.get(Objeto, objeto_id)
         
         if not objeto:
