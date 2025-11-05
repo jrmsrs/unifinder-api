@@ -13,3 +13,4 @@ class Comentario(SQLModel, table=True):
     username: str = Field(foreign_key="user.username")
 
     objeto: Optional["Objeto"] = Relationship(back_populates="comentarios")
+    user: Optional["User"] = Relationship(back_populates="comentarios")
