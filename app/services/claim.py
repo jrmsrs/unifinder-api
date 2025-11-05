@@ -63,7 +63,7 @@ class ClaimService:
 
         msg = f"O objeto {objeto.nome} tem uma nova reividicação!"
 
-        await self.notifications.notify_users([str(claim.tutor_id)], msg)
+        self.notifications.notify_users([str(claim.tutor_id)], msg)
 
         return claim
 
@@ -89,7 +89,7 @@ class ClaimService:
 
         msg = f"Sua reividicação para o '{objeto.nome}' foi aprovada!"
 
-        await self.notifications.notify_users([str(claim.user_id)], msg)
+        self.notifications.notify_users([str(claim.user_id)], msg)
 
         return claim
 
@@ -111,7 +111,7 @@ class ClaimService:
 
         msg = f"Sua reividicação para o id_objeto foi rejeitada!"
 
-        await self.notifications.notify_users([str(claim.user_id)], msg)
+        self.notifications.notify_users([str(claim.user_id)], msg)
 
         return claim
 
@@ -135,7 +135,7 @@ class ClaimService:
 
         msg = f"Sua reividicação para o id_objeto foi finalizada!"
 
-        await self.notifications.notify_users([str(claim.tutor_id)], msg)
+        self.notifications.notify_users([str(claim.tutor_id)], msg)
 
         return claim
 

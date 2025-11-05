@@ -4,7 +4,6 @@ Factory functions para injeção de dependência dos serviços
 from fastapi import Depends
 from sqlmodel import Session
 from app.infra.database import get_session
-from app.integrations.sse_manager import SSEManager, get_sse_manager
 from app.services.comentario import ComentarioService
 from app.services.objeto import ObjetoService
 from app.services.notify import NotificationService
@@ -20,10 +19,9 @@ def get_objeto_service(session: Session = Depends(get_session)) -> ObjetoService
 
 
 def get_notification_service(
-    session: Session = Depends(get_session),
-    sse_manager: SSEManager = Depends(get_sse_manager)
+    session: Session = Depends(get_session)
 ) -> NotificationService:
-    return NotificationService(session, sse_manager)
+    return NotificationService(session)
 
 
 def get_claim_service(
