@@ -17,10 +17,14 @@ class ObjetoUpdate(BaseModel):
     local_armazenamento: Optional[str] = None
     status: Optional[StatusObjeto] = None
 
+class ObjetoFinalizacao(BaseModel):
+    motivo_finalizacao: str
+
 class ObjetoRead(ObjetoBase):
     id: uuid.UUID
     user_id: uuid.UUID
     local_armazenamento: Optional[str] = None
     data_registro: datetime
     status: StatusObjeto
+    motivo_finalizacao: Optional[str] = None
     user: User

@@ -18,6 +18,7 @@ class Objeto(SQLModel, table=True):
     data_registro: datetime = Field(default_factory=datetime.utcnow)
     url_imagem: str = Field(default=None, nullable=True)
     categoria: str = Field(default=None, nullable=True)
+    motivo_finalizacao: Optional[str] = Field(default=None, nullable=True)
 
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="objetos")

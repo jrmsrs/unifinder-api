@@ -4,7 +4,8 @@ from typing import List, Optional
 from sqlmodel import Session, select, desc
 from app.models.objeto import Objeto
 from app.models.user import User
-from app.schemas.objeto import ObjetoBase, ObjetoUpdate
+from app.schemas.objeto import ObjetoBase, ObjetoUpdate, ObjetoFinalizacao
+from app.enums.objeto import StatusObjeto
 
 
 class ObjetoService:
@@ -61,6 +62,30 @@ class ObjetoService:
 
         objeto.local_armazenamento = objeto_data.local_armazenamento
         objeto.status = objeto_data.status
+
+        self.session.add(objeto)
+        self.session.commit()
+        self.session.refresh(objeto)
+
+        return objeto
+
+    def finalizar_objeto(self, user_id: uuid.UUID, objeto_id: uuid.UUID, finalizacao_data: ObjetoFinalizacao) -> Objeto:
+        if isinstance(user_id, str):
+            user_id = uuid.UUID(user_id)
+        
+        objeto = self.session.get(Objeto, objeto_id)
+        
+        if not objeto:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objeto não encontrado")
+        
+        if objeto.user_id != user_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Objeto não pertence ao usuário")
+        
+        if objeto.status == StatusObjeto.finalizado:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Objeto já foi finalizado")
+
+        objeto.status = StatusObjeto.finalizado
+        objeto.motivo_finalizacao = finalizacao_data.motivo_finalizacao
 
         self.session.add(objeto)
         self.session.commit()
