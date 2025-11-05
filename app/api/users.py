@@ -8,7 +8,7 @@ from app.schemas.objeto import ObjetoRead
 from app.schemas.objeto import ObjetoBase
 from app.infra.database import get_session
 from app.models.user import User
-from app.schemas.user import UserBase, UserRead
+from app.schemas.user import UserBase, UserRead, UserUpdate
 from app.services.objeto import ObjetoService
 from app.services.factories import get_objeto_service
 
@@ -42,9 +42,36 @@ def create_user(user_in: UserBase, session: Session = Depends(get_session)):
     session.refresh(user)
     return user
 
-@router.put("/")
-def update_user():
-    pass
+@router.put("/{user_id}", response_model=UserRead)
+def update_user(
+    user_id: uuid.UUID,
+    user_update: UserUpdate,
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(get_user_session)
+):
+    """
+    Atualiza dados do usuário.
+    Apenas o próprio usuário pode atualizar seus dados.
+    """
+    # Verificar se o usuário está tentando atualizar seus próprios dados
+    current_user_id = uuid.UUID(current_user.get("user_id"))
+    if user_id != current_user_id:
+        raise HTTPException(status_code=403, detail="Você só pode atualizar seus próprios dados")
+    
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User não encontrado")
+    
+    # Atualizar apenas campos fornecidos
+    update_data = user_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(user, field, value)
+    
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    
+    return user
 
 @router.get("/{user_id}/objetos", response_model= Page[ObjetoRead])
 def get_objetos(
