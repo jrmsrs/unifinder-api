@@ -10,7 +10,7 @@ class Comentario(SQLModel, table=True):
 
     objeto_id: uuid.UUID = Field(foreign_key="objeto.id")
     user_id: uuid.UUID = Field(foreign_key="user.id")
-    username: str = Field(foreign_key="user.username")
+    username: str  # Mantido para referência, mas não como foreign key no relacionamento
 
     objeto: Optional["Objeto"] = Relationship(back_populates="comentarios")
     user: Optional["User"] = Relationship(back_populates="comentarios")
