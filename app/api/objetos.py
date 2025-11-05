@@ -5,7 +5,7 @@ from fastapi_pagination import Page, paginate
 from app.auth.auth import get_user_session
 from app.schemas.claim import ClaimRead
 from app.schemas.comentario import ComentarioRead
-from app.schemas.objeto import ObjetoBase, ObjetoUpdate, ObjetoRead
+from app.schemas.objeto import ObjetoBase, ObjetoUpdate, ObjetoRead, ObjetoFinalizacao
 from app.services.claim import ClaimService
 from app.services.comentario import ComentarioService
 from app.services.factories import get_claim_service, get_objeto_service, get_comentario_service
@@ -54,6 +54,17 @@ def put_objeto(
 ):
     user_id = current_user.get("user_id")
     return objeto_service.update_objeto(user_id, objeto_id, objeto_data)
+
+
+@router.put("/{objeto_id}/finalizar", response_model=ObjetoRead)
+def finalizar_objeto(
+    objeto_id: uuid.UUID,
+    finalizacao_data: ObjetoFinalizacao,
+    objeto_service: ObjetoService = Depends(get_objeto_service),
+    current_user: dict = Depends(get_user_session)
+):
+    user_id = current_user.get("user_id")
+    return objeto_service.finalizar_objeto(user_id, objeto_id, finalizacao_data)
 
 
 @router.get("/{objeto_id}/comentarios", response_model=Page[ComentarioRead])
