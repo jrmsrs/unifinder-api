@@ -62,7 +62,7 @@ class ClaimService:
 
         self._update_status_objeto(claim_data.objeto_id, StatusObjeto.em_reivindicacao)
 
-        msg = f"O objeto {objeto.nome} tem uma nova reividicação!"
+        msg = f"O objeto {objeto.nome} tem uma nova reivindicação!"
 
         self.notifications.notify_users([str(claim.tutor_id)], msg)
 
@@ -89,7 +89,7 @@ class ClaimService:
 
         objeto = self.session.get(Objeto, claim.objeto_id)
 
-        msg = f"Sua reividicação para o '{objeto.nome}' foi aprovada!"
+        msg = f"Sua reivindicação para o '{objeto.nome}' foi aprovada!"
 
         self.notifications.notify_users([str(claim.user_id)], msg)
 
@@ -113,7 +113,7 @@ class ClaimService:
         self._update_status_objeto(claim.objeto_id, StatusObjeto.aberto)
 
         objeto = self.session.get(Objeto, claim.objeto_id)
-        msg = f"Sua reividicação para o '{objeto.nome}' foi rejeitada!"
+        msg = f"Sua reivindicação para o '{objeto.nome}' foi rejeitada!"
 
         self.notifications.notify_users([str(claim.user_id)], msg)
 
@@ -137,7 +137,7 @@ class ClaimService:
         self._finalize_objeto(claim.objeto_id, f"Objeto entregue ao reivindicante {user.nome}")
 
         objeto = self.session.get(Objeto, claim.objeto_id)
-        msg = f"Sua reividicação para o '{objeto.nome}' foi finalizada!"
+        msg = f"Sua reivindicação para o '{objeto.nome}' foi finalizada!"
 
         self.notifications.notify_users([str(claim.tutor_id)], msg)
         self.notifications.notify_users([str(claim.tutor_id)], msg)
