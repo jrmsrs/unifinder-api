@@ -18,3 +18,6 @@ class ClaimRead(ClaimBase):
     objeto_id: uuid.UUID
     user_id: uuid.UUID
     tutor_id: uuid.UUID
+
+class ClaimReview(BaseModel):
+    motivo: str
