@@ -112,7 +112,8 @@ class ClaimService:
 
         self._update_status_objeto(claim.objeto_id, StatusObjeto.aberto)
 
-        msg = f"Sua reividicação para o id_objeto foi rejeitada!"
+        objeto = self.session.get(Objeto, claim.objeto_id)
+        msg = f"Sua reividicação para o '{objeto.nome}' foi rejeitada!"
 
         self.notifications.notify_users([str(claim.user_id)], msg)
 
@@ -123,10 +124,8 @@ class ClaimService:
 
         if not claim:
             raise HTTPException(status_code=404, detail="Reivindicação não encontrada")
-
         if str(claim.user_id) != user_id:
-            print(claim.user_id)
-            print(user_id)
+            raise HTTPException(status_code=403, detail="Usuário não autorizado a finalizar esta reivindicação")
             raise HTTPException(status_code=403, detail="Usuário não autorizado a finalizar esta reivindicação")
 
         claim.status = StatusClaim.concluida
@@ -135,11 +134,12 @@ class ClaimService:
         self.session.refresh(claim)
 
         user = self.session.get(User, claim.user_id)
-
         self._finalize_objeto(claim.objeto_id, f"Objeto entregue ao reivindicante {user.nome}")
 
-        msg = f"Sua reividicação para o id_objeto foi finalizada!"
+        objeto = self.session.get(Objeto, claim.objeto_id)
+        msg = f"Sua reividicação para o '{objeto.nome}' foi finalizada!"
 
+        self.notifications.notify_users([str(claim.tutor_id)], msg)
         self.notifications.notify_users([str(claim.tutor_id)], msg)
 
         return claim
