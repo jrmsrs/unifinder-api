@@ -31,7 +31,9 @@ class ObjetoService:
             query = query.where(
                 (Objeto.nome.ilike(search_term)) |
                 (Objeto.descricao.ilike(search_term)) |
-                (Objeto.local_armazenamento.ilike(search_term))
+                (Objeto.local_armazenamento.ilike(search_term)) |
+                (Objeto.local_ocorrencia.ilike(search_term)) |
+                (Objeto.local_especifico.ilike(search_term))
             )
 
         return self.session.exec(query).all()
