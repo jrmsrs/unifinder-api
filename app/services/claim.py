@@ -6,7 +6,8 @@ from app.enums.claim import StatusClaim
 from app.enums.objeto import StatusObjeto
 from app.models.claim import Claim
 from app.models.objeto import Objeto
-from app.schemas.claim import ClaimBase, ClaimRead
+from app.models.user import User
+from app.schemas.claim import ClaimBase, ClaimRead, ClaimReview
 from app.services.notify import NotificationService
 
 
@@ -47,7 +48,7 @@ class ClaimService:
             raise HTTPException(status_code=400, detail="Objeto não disponível para reivindicação")
 
         claim = Claim(
-            descricao=claim_data.descricao,
+            descricao=f"## Reivindicação ##\n\n{claim_data.descricao}",
             local_ocorrencia=claim_data.local_ocorrencia,
             evidencias=claim_data.evidencias,
             objeto_id=uuid.UUID(str(claim_data.objeto_id)),
@@ -61,14 +62,14 @@ class ClaimService:
 
         self._update_status_objeto(claim_data.objeto_id, StatusObjeto.em_reivindicacao)
 
-        msg = f"O objeto {objeto.nome} tem uma nova reividicação!"
+        msg = f"O objeto {objeto.nome} tem uma nova reivindicação!"
 
         self.notifications.notify_users([str(claim.tutor_id)], msg)
 
         return claim
 
 
-    async def approve_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID) -> Claim:
+    async def approve_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID, claim_data: ClaimReview) -> Claim:
         claim = self.session.get(Claim, claim_id)
 
         if not claim:
@@ -79,6 +80,7 @@ class ClaimService:
             raise HTTPException(status_code=403, detail="Usuário não autorizado a aprovar esta reivindicação")
 
         claim.status = StatusClaim.aprovada
+        claim.descricao += f"\n\n[Réplica do Tutor]:\n\n{claim_data.motivo}"
         self.session.add(claim)
         self.session.commit()
         self.session.refresh(claim)
@@ -87,13 +89,13 @@ class ClaimService:
 
         objeto = self.session.get(Objeto, claim.objeto_id)
 
-        msg = f"Sua reividicação para o '{objeto.nome}' foi aprovada!"
+        msg = f"Sua reivindicação para o '{objeto.nome}' foi aprovada!"
 
         self.notifications.notify_users([str(claim.user_id)], msg)
 
         return claim
 
-    async def reject_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID) -> Claim:
+    async def reject_claim(self, user_id: uuid.UUID, claim_id: uuid.UUID, claim_data: ClaimReview) -> Claim:
         claim = self.session.get(Claim, claim_id)
 
         if not claim:
@@ -103,13 +105,15 @@ class ClaimService:
             raise HTTPException(status_code=403, detail="Usuário não autorizado a rejeitar esta reivindicação")
 
         claim.status = StatusClaim.rejeitada
+        claim.descricao += f"\n\n[Réplica do Tutor]:\n\n{claim_data.motivo}"
         self.session.add(claim)
         self.session.commit()
         self.session.refresh(claim)
 
         self._update_status_objeto(claim.objeto_id, StatusObjeto.aberto)
 
-        msg = f"Sua reividicação para o id_objeto foi rejeitada!"
+        objeto = self.session.get(Objeto, claim.objeto_id)
+        msg = f"Sua reivindicação para o '{objeto.nome}' foi rejeitada!"
 
         self.notifications.notify_users([str(claim.user_id)], msg)
 
@@ -120,10 +124,8 @@ class ClaimService:
 
         if not claim:
             raise HTTPException(status_code=404, detail="Reivindicação não encontrada")
-
         if str(claim.user_id) != user_id:
-            print(claim.user_id)
-            print(user_id)
+            raise HTTPException(status_code=403, detail="Usuário não autorizado a finalizar esta reivindicação")
             raise HTTPException(status_code=403, detail="Usuário não autorizado a finalizar esta reivindicação")
 
         claim.status = StatusClaim.concluida
@@ -131,10 +133,13 @@ class ClaimService:
         self.session.commit()
         self.session.refresh(claim)
 
-        self._update_status_objeto(claim.objeto_id, StatusObjeto.finalizado)
+        user = self.session.get(User, claim.user_id)
+        self._finalize_objeto(claim.objeto_id, f"Objeto entregue ao reivindicante {user.nome}")
 
-        msg = f"Sua reividicação para o id_objeto foi finalizada!"
+        objeto = self.session.get(Objeto, claim.objeto_id)
+        msg = f"Sua reivindicação para o '{objeto.nome}' foi finalizada!"
 
+        self.notifications.notify_users([str(claim.tutor_id)], msg)
         self.notifications.notify_users([str(claim.tutor_id)], msg)
 
         return claim
@@ -145,6 +150,17 @@ class ClaimService:
             raise HTTPException(status_code=404, detail="Objeto não encontrado")
 
         objeto.status = new_status
+        self.session.add(objeto)
+        self.session.commit()
+        self.session.refresh(objeto)
+    
+    def _finalize_objeto(self, objeto_id: uuid.UUID, motivo_finalizacao: str):
+        objeto = self.session.get(Objeto, objeto_id)
+        if not objeto:
+            raise HTTPException(status_code=404, detail="Objeto não encontrado")
+
+        objeto.motivo_finalizacao = motivo_finalizacao
+        objeto.status = StatusObjeto.finalizado
         self.session.add(objeto)
         self.session.commit()
         self.session.refresh(objeto)

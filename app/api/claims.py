@@ -5,7 +5,7 @@ from fastapi_pagination import Page, paginate
 from app.auth.auth import get_user_session
 from app.services.claim import ClaimService
 from app.services.factories import get_claim_service
-from app.schemas.claim import ClaimBase, ClaimRead
+from app.schemas.claim import ClaimBase, ClaimRead, ClaimReview
 
 router = APIRouter()
 
@@ -48,21 +48,23 @@ async def post_claim(
 @router.put("/{claim_id}/aprovar", response_model=ClaimRead)
 async def approve_claim(
     claim_id: uuid.UUID,
+    claim_data: ClaimReview,
     current_user: dict = Depends(get_user_session),
     claim_service: ClaimService = Depends(get_claim_service),
 ):
     user_id = current_user.get("user_id")
-    return await claim_service.approve_claim(user_id, claim_id)
+    return await claim_service.approve_claim(user_id, claim_id, claim_data)
 
 
 @router.put("/{claim_id}/rejeitar", response_model=ClaimRead)
 async def reject_claim(
     claim_id: uuid.UUID,
+    claim_data: ClaimReview,
     current_user: dict = Depends(get_user_session),
     claim_service: ClaimService = Depends(get_claim_service),
 ):
     user_id = current_user.get("user_id")
-    return await claim_service.reject_claim(user_id, claim_id)
+    return await claim_service.reject_claim(user_id, claim_id, claim_data)
 
 
 @router.put("/{claim_id}/finalizar", response_model=ClaimRead)

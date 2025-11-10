@@ -12,6 +12,7 @@ class Objeto(SQLModel, table=True):
     nome: str
     descricao: str
     local_ocorrencia: str
+    local_especifico: Optional[str] = Field(default=None, nullable=True)
     local_armazenamento: str = Field(default=None, nullable=True)
     tipo: TipoObjeto
     status: StatusObjeto = Field(default=StatusObjeto.aberto)
