@@ -39,7 +39,7 @@ class ObjetoService:
     def get_objeto(self, objeto_id: uuid.UUID):
         objeto = self.session.get(Objeto, objeto_id)
         if not objeto:
-            raise HTTPException(status_code=404, detail="Objeto não encontrado")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objeto não encontrado")
         return objeto
 
     def create_objeto(self, user_id: uuid.UUID, objeto_data: ObjetoBase) -> Objeto:
@@ -55,13 +55,20 @@ class ObjetoService:
         return objeto
 
     def update_objeto(self, user_id: uuid.UUID, objeto_id: uuid.UUID, objeto_data: ObjetoUpdate) -> Objeto:
+        if isinstance(user_id, str):
+            user_id = uuid.UUID(user_id)
+        
         objeto = self.session.get(Objeto, objeto_id)
         
-        if not objeto or objeto.user_id != user_id:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objeto não pertence ao usuário")
-
-        objeto.local_armazenamento = objeto_data.local_armazenamento
-        objeto.status = objeto_data.status
+        if not objeto:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objeto não encontrado")
+        
+        if objeto.user_id != user_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Objeto não pertence ao usuário")
+        
+        for key, value in objeto_data.model_dump(exclude_unset=True).items():
+            setattr(objeto, key, value)
+        objeto.motivo_finalizacao = None
 
         self.session.add(objeto)
         self.session.commit()
