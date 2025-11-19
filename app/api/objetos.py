@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 import uuid
 from fastapi import APIRouter, Depends, Query
 from fastapi_pagination import Page, paginate
@@ -29,8 +29,8 @@ def post_objeto(
 def get_objetos(
     tipo: Optional[str] = Query(default=None),
     status: Optional[str] = Query(default=None),
-    categoria: Optional[str] = Query(default=None),
-    local_ocorrencia: Optional[str] = Query(default=None),
+    categoria: Optional[List[str]] = Query(default=None),
+    local_ocorrencia: Optional[List[str]] = Query(default=None),
     search: Optional[str] = Query(default=None),
     user_id: Optional[uuid.UUID] = Query(default=None),
     objeto_service: ObjetoService = Depends(get_objeto_service)

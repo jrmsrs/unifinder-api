@@ -16,8 +16,8 @@ class ObjetoService:
         self, 
         tipo: Optional[str] = None, 
         status: Optional[str] = None, 
-        categoria: Optional[str] = None, 
-        local_ocorrencia: Optional[str] = None, 
+        categoria: Optional[List[str]] = None,
+        local_ocorrencia: Optional[List[str]] = None,
         search: Optional[str] = None,
         user_id: Optional[uuid.UUID] = None
     ) -> List[Objeto]:
@@ -32,9 +32,9 @@ class ObjetoService:
             else:
                 query = query.where(Objeto.status == status)
         if categoria:
-            query = query.where(Objeto.categoria == categoria)
+            query = query.where(Objeto.categoria.in_(categoria))
         if local_ocorrencia:
-            query = query.where(Objeto.local_ocorrencia == local_ocorrencia)
+            query = query.where(Objeto.local_ocorrencia.in_(local_ocorrencia))
         if search:
             search_term = f"%{search.lower()}%"
             query = query.where(
