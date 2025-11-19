@@ -32,9 +32,10 @@ def get_objetos(
     categoria: Optional[str] = Query(default=None),
     local_ocorrencia: Optional[str] = Query(default=None),
     search: Optional[str] = Query(default=None),
+    user_id: Optional[uuid.UUID] = Query(default=None),
     objeto_service: ObjetoService = Depends(get_objeto_service)
 ):
-    return paginate(objeto_service.fetch_objetos(tipo, status, categoria, local_ocorrencia, search))
+    return paginate(objeto_service.fetch_objetos(tipo, status, categoria, local_ocorrencia, search, user_id))
 
 
 @router.get("/{objeto_id}", response_model=ObjetoRead)
